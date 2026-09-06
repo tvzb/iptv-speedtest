@@ -27,7 +27,10 @@ if __name__ == "__main__":
     weishi_channels = []
     other_channels = []
     
-    print("开始测速与频道分类...")
+    # 新增：用于记录已处理过的链接，实现去重
+    seen_urls = set()
+    
+    print("开始测速、去重与频道分类...")
     for line in lines:
         line = line.strip()
         if not line or '#genre#' in line:
@@ -35,6 +38,12 @@ if __name__ == "__main__":
             
         if ',' in line:
             name, url = line.split(',', 1)
+            
+            # 新增：去重逻辑，如果URL已存在则直接跳过
+            if url in seen_urls:
+                continue
+            seen_urls.add(url)
+            
             speed = test_speed(url)
             
             if speed < 9999:
@@ -49,7 +58,7 @@ if __name__ == "__main__":
             else:
                 print(f"❌ {name} 失效或超时，已删除")
 
-    # 对有效频道按速度（speed）进行升序排列，速度相同时保留原排列顺序
+    # 对有效频道按速度（speed）进行升序排列
     cctv_channels.sort(key=lambda x: x[2])
     weishi_channels.sort(key=lambda x: x[2])
     other_channels.sort(key=lambda x: x[2])
